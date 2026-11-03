@@ -87,10 +87,10 @@
   .toast.show{opacity:1}
 </style>
 
-<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&family=Noto+Sans+Myanmar:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{--coral:#FF8066;--coralD:#E8604A;--butter:#FFD66B;--butterL:#FFF1C4;--sage:#A8C9A5;--cream:#FFF8ED;--char:#353535}
-html,body{background:var(--cream);color:var(--char);font-family:"Prompt","IBM Plex Sans Thai",sans-serif}
+html,body{background:var(--cream);color:var(--char);font-family:"Prompt","Noto Sans Myanmar","IBM Plex Sans Thai",sans-serif}
 header{position:relative;overflow:hidden;background:linear-gradient(120deg,#FF7A63 0%,#FF8066 45%,#FFA88F 100%);color:#fff;margin:0;
   padding:22px 18px 30px;border-radius:0 0 30px 30px;align-items:center;box-shadow:0 8px 20px rgba(255,128,102,.25)}
 .logo{width:60px;height:60px;border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 4px 10px rgba(0,0,0,.08);z-index:1}
@@ -167,17 +167,30 @@ header{padding-bottom:38px}
 .bar .clearb.arm{color:#fff;background:#C0392B}
 .bar .sendlink{flex:1;height:72px;border-radius:999px;font-size:19px;font-weight:600;color:#fff;display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;background:linear-gradient(135deg,#3BC66A,#1FA453);box-shadow:0 4px 14px rgba(0,0,0,.12)}
 </style>
+<style>
+.langsw{display:inline-flex;margin-top:8px;background:rgba(255,255,255,.28);border-radius:999px;padding:3px;gap:2px}
+.langsw button{color:#fff;padding:3px 14px;border-radius:999px;font-size:16px;font-weight:600}
+.langsw button.on{background:#fff;color:var(--coralD)}
+body.my{line-height:1.7}
+body.my .row .name{font-size:21px}
+.thai{display:block;font-size:15px;font-weight:400;color:#8a7a6a;line-height:1.3}
+h2 .thai{display:inline;margin-left:6px}
+.sdel{width:44px;height:44px;border-radius:999px;background:var(--cream);color:#C0392B;font-size:18px;box-shadow:0 2px 6px rgba(0,0,0,.1);flex:none}
+.addmore{width:100%;height:56px;border-radius:999px;background:#fff;border:2px dashed #F3B9A8;color:var(--coralD);font-weight:600;font-size:18px;margin:4px 0 10px}
+#addCard{margin:0 0 12px}
+</style>
 </head>
 <body>
 <header><div class="logo" style="color:#FF8066"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2.2l2.3 10.2a1.5 1.5 0 0 0 1.5 1.1h8.3a1.5 1.5 0 0 0 1.5-1.1L21 8H6.3"/><circle cx="9.5" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/></svg></div><div class="veg" aria-hidden="true"><span>🥬</span><span>🍅</span><span>🫑</span></div>
   <div class="t">
-    <h1>ซื้อของเข้าครัว</h1>
+    <h1 data-t="title">ซื้อของเข้าครัว</h1>
     <div class="date" id="today"></div>
+    <div class="langsw"><button data-lang="th">ไทย</button><button data-lang="my">မြန်မာ</button></div>
   </div>
 </header>
 <nav class="tabs">
-  <button id="tabList" class="active">📝 จดรายการ</button>
-  <button id="tabShop">🛒 ไปซื้อของ</button>
+  <button id="tabList" class="active" data-t="tabList">📝 จดรายการ</button>
+  <button id="tabShop" data-t="tabShop">🛒 ไปซื้อของ</button>
 </nav>
 <div id="viewList">
 <div class="count" id="count"></div>
@@ -186,23 +199,34 @@ header{padding-bottom:38px}
 <div id="viewShop" hidden>
   <div id="shopEmpty" class="shop-card">
     <h3>วางรายการจาก LINE</h3>
+    <div class="small" style="margin-bottom:8px">วางได้ทั้งข้อความจากแอป และข้อความธรรมดา (บรรทัดละ 1 อย่าง)</div>
     <ol class="howto">
       <li>เปิด LINE กด<b>ค้าง</b>ที่ข้อความรายการ แล้วกด <b>คัดลอก</b></li>
       <li>กลับมาที่นี่ กด<b>ค้าง</b>ในช่องด้านล่าง แล้วกด <b>วาง</b></li>
       <li>กด <b>สร้างรายการ</b></li>
     </ol>
     <textarea id="pasteBox" placeholder="วางข้อความจาก LINE ที่นี่"></textarea>
-    <div class="paste-err" id="pasteErr" hidden>ไม่พบรายการในข้อความนี้ ลองคัดลอกข้อความที่ขึ้นต้นด้วย 🛒 อีกครั้งนะ</div>
+    <div class="paste-err" id="pasteErr" hidden>ไม่พบรายการในข้อความนี้ ลองคัดลอกข้อความอีกครั้งนะ</div>
     <button class="big-ok" id="makeShop">สร้างรายการ</button>
   </div>
   <div id="shopList" hidden>
     <div class="prog"><div class="prog-t" id="progT"></div><div class="prog-bar"><i id="progBar"></i></div></div>
+    <div style="margin:12px 12px 0">
+      <button class="addmore" id="addMoreBtn">+ วางข้อความเพิ่ม (จากแม่บ้านอีกคน)</button>
+      <div id="addCard" class="shop-card" hidden style="margin:0 0 12px">
+        <h3>วางข้อความเพิ่ม</h3>
+        <div class="small" style="margin-bottom:8px">ของที่ซ้ำกับรายการเดิมจะรวมไว้แถวเดียวกัน</div>
+        <textarea id="pasteMore" placeholder="วางข้อความที่นี่"></textarea>
+        <div class="paste-err" id="moreErr" hidden>ไม่พบรายการในข้อความนี้</div>
+        <div class="actions"><button class="btn-ghost" id="moreCancel">ยกเลิก</button><button class="btn-ok" id="moreAdd">เพิ่มเข้ารายการ</button></div>
+      </div>
+    </div>
     <main id="shopItems"></main>
   </div>
 </div>
 
 <div class="bar" id="barList">
-  <button class="micb" id="micBtn"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M12 18v3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>พูดสั่งเพิ่ม</button>
+  <button class="micb" id="micBtn"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M12 18v3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><span data-t="mic">พูดสั่งเพิ่ม</span></button>
   <button class="send" id="sendBtn">ส่ง LINE</button>
 </div>
 
@@ -215,29 +239,29 @@ header{padding-bottom:38px}
 
 <!-- Voice sheet -->
 <div class="sheet" id="voiceSheet">
-  <h3>🎤 พูดของที่จะซื้อเพิ่ม</h3>
+  <h3 data-t="vTitle">🎤 พูดของที่จะซื้อเพิ่ม</h3>
   <button class="srb" id="srBtn" hidden>🎤 แตะแล้วพูดได้เลย</button>
-  <div class="hint" id="kbHint"><span id="kbAlt" hidden>ถ้าปุ่มด้านบนใช้ไม่ได้: </span>แตะช่องสีขาวด้านล่าง แล้วกด <b>รูปไมค์ 🎤 บนแป้นพิมพ์</b> แล้วพูดได้เลย<br>
-    เช่น <i>“มะนาว 5 ลูก แล้วก็ผักบุ้ง 2 กำ ไข่ไก่ 2 แผง”</i></div>
+  <div class="hint" id="kbHint"><span id="kbAlt" hidden data-t="kbAlt">ถ้าปุ่มด้านบนใช้ไม่ได้: </span><span data-t="kbHint">แตะช่องสีขาวด้านล่าง แล้วกด <b>รูปไมค์ 🎤 บนแป้นพิมพ์</b> แล้วพูดได้เลย<br>
+    เช่น <i>“มะนาว 5 ลูก แล้วก็ผักบุ้ง 2 กำ ไข่ไก่ 2 แผง”</i></span></div>
   <textarea id="vtext" placeholder="ข้อความที่พูดจะขึ้นตรงนี้"></textarea>
   <div class="pv" id="preview"></div>
   <div class="actions">
-    <button class="btn-ghost" data-close>ยกเลิก</button>
+    <button class="btn-ghost" data-close data-t="cancel">ยกเลิก</button>
     <button class="btn-ok" id="addBtn" disabled>เพิ่มลงรายการ</button>
   </div>
 </div>
 
 <!-- Send sheet -->
 <div class="sheet" id="sendSheet">
-  <h3>ส่งรายการทาง LINE</h3>
-  <div class="small">กดปุ่มสีเขียว แอป LINE จะเปิดขึ้นมา แล้วเลือกชื่อคนที่จะส่ง กดส่งได้เลย</div>
+  <h3 data-t="sTitle">ส่งรายการทาง LINE</h3>
+  <div class="small" data-t="sHint">กดปุ่มสีเขียว แอป LINE จะเปิดขึ้นมา แล้วเลือกชื่อคนที่จะส่ง กดส่งได้เลย</div>
   <pre class="msg" id="msgPreview"></pre>
   <div class="actions">
-    <button class="btn-ghost" id="copyBtn">คัดลอกข้อความ</button>
-    <a class="btn-line" id="lineLink" href="#" target="_blank" rel="noopener">เปิด LINE เพื่อส่ง</a>
+    <button class="btn-ghost" id="copyBtn" data-t="copy">คัดลอกข้อความ</button>
+    <a class="btn-line" id="lineLink" href="#" target="_blank" rel="noopener" data-t="openLine">เปิด LINE เพื่อส่ง</a>
   </div>
-  <button class="reset" id="resetBtn">ส่งแล้ว ✓ ล้างรายการ เริ่มอาทิตย์ใหม่</button>
-  <div class="actions"><button class="btn-ghost" data-close>กลับ</button></div>
+  <button class="reset" id="resetBtn" data-t="reset">ส่งแล้ว ✓ ล้างรายการ เริ่มอาทิตย์ใหม่</button>
+  <div class="actions"><button class="btn-ghost" data-close data-t="back">กลับ</button></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -254,7 +278,37 @@ const DEFAULT_ITEMS = [
   ['ถุงพลาสติกใส่อาหาร','แพ็ค',4]
 ].map(a=>({id:a[0],name:a[0],unit:a[1],cat:CATS[a[2]]}));
 
-const K_ITEMS='kitchen.items.v1', K_STATE='kitchen.state.v1';
+const K_ITEMS='kitchen.items.v1', K_STATE='kitchen.state.v1', K_LANG='kitchen.lang.v1';
+const MY_ITEM={'ไข่ไก่':'ကြက်ဥ','ข้าวคน':'ဆန်','ข้าวหมา':'ခွေးစာ','น้ำมันพืช':'ဟင်းချက်ဆီ','ซีอิ๊วถั่วเหลือง':'ပဲငံပြာရည်',
+ 'ซีอิ๊วเห็ดหอม':'မှိုပဲငံပြာရည်','น้ำปลา':'ငံပြာရည်','น้ำมันหอย':'ခရုဆီ','รสดี':'ဟင်းခတ်မှုန့် (Rosdee)','กะทิ':'အုန်းနို့',
+ 'เกลือ':'ဆား','น้ำตาล':'သကြား','พริกไทย':'ငရုတ်ကောင်း','พริก':'ငရုတ်သီး','กระเทียม':'ကြက်သွန်ဖြူ','หอมแดง':'ကြက်သွန်နီ',
+ 'ผักต่างๆ':'ဟင်းသီးဟင်းရွက်','หมูสับ':'ဝက်သားကြိတ်','หมูชิ้น':'ဝက်သားတုံး','กระดูกหมู':'ဝက်အရိုး','โครงไก่':'ကြက်အရိုး',
+ 'ถุงพลาสติกใส่อาหาร':'အစားအစာထည့် ပလတ်စတစ်အိတ်'};
+const MY_CAT={'ข้าวและไข่':'ဆန်နှင့် ကြက်ဥ','เครื่องปรุง':'ဟင်းခတ်ပစ္စည်း','ผักและสมุนไพร':'ဟင်းသီးဟင်းရွက်','เนื้อสัตว์':'အသား','ของใช้':'အသုံးအဆောင်'};
+const MY_UNIT={'แผง':'ကဒ်','ถุง':'အိတ်','ขวด':'ပုလင်း','กล่อง':'ဘူး','ขีด':'(100 ဂရမ်)','กิโล':'ကီလို','แพ็ค':'ထုပ်','ลูก':'လုံး','กำ':'စည်း','ฟอง':'လုံး','หัว':'လုံး','ห่อ':'ထုပ်','ซอง':'ထုပ်','กระป๋อง':'ဘူး'};
+const TX={
+ title:['ซื้อของเข้าครัว','ဈေးဝယ်စာရင်း'],
+ tabList:['📝 จดรายการ','📝 စာရင်းရေး'], tabShop:['🛒 ไปซื้อของ','🛒 ဈေးဝယ်'],
+ mic:['พูดสั่งเพิ่ม','ပြောပြီး ထပ်မှာ'], send:['ส่ง LINE','LINE ပို့'], buy:['ซื้อ','ဝယ်မယ်'],
+ selected:['เลือกแล้ว <b>{n}</b> รายการ','ရွေးပြီး <b>{n}</b> ခု'], tapBuy:['แตะ “ซื้อ” ที่ของที่ต้องการ','လိုတာကို “ဝယ်မယ်” နှိပ်ပါ'],
+ extras:['ของที่ขอซื้อเพิ่ม','ထပ်ဝယ်ရန်'], noExtras:['ยังไม่มี กดปุ่ม 🎤 ด้านล่างเพื่อพูดสั่งเพิ่ม','မရှိသေးပါ။ အောက်က 🎤 ကိုနှိပ်ပြီး ပြောပါ'],
+ vTitle:['🎤 พูดของที่จะซื้อเพิ่ม','🎤 ထပ်ဝယ်ချင်တာ ပြောပါ (ထိုင်းလို)'],
+ srIdle:['🎤 แตะแล้วพูดได้เลย','🎤 နှိပ်ပြီး ပြောပါ'], srOn:['กำลังฟัง… แตะเพื่อหยุด','နားထောင်နေတယ်… ရပ်ရန် နှိပ်ပါ'], srAgain:['🎤 แตะแล้วพูดต่อได้','🎤 ထပ်ပြောရန် နှိပ်ပါ'],
+ kbAlt:['ถ้าปุ่มด้านบนใช้ไม่ได้: ','အပေါ်ကခလုတ် မရရင်: '],
+ kbHint:['แตะช่องสีขาวด้านล่าง แล้วกด <b>รูปไมค์ 🎤 บนแป้นพิมพ์</b> แล้วพูดได้เลย<br>เช่น <i>“มะนาว 5 ลูก แล้วก็ผักบุ้ง 2 กำ ไข่ไก่ 2 แผง”</i>',
+         'အောက်က အဖြူကွက်ကို နှိပ်ပြီး <b>ကီးဘုတ်ပေါ်က 🎤</b> ကို နှိပ်ကာ <b>ထိုင်းလို</b> ပြောပါ'],
+ inList:['✓ ติ๊กในลิสต์: ','✓ စာရင်းထဲမှာ: '], extraTag:['+ ของเพิ่ม','+ ထပ်ဝယ်'],
+ cancel:['ยกเลิก','မလုပ်တော့ဘူး'], addN:['เพิ่ม {n} รายการ','{n} ခု ထည့်မယ်'], addEmpty:['เพิ่มลงรายการ','ထည့်မယ်'], added:['เพิ่มแล้ว {n} รายการ','{n} ခု ထည့်ပြီး'],
+ sTitle:['ส่งรายการทาง LINE','LINE နဲ့ ပို့မယ်'],
+ sHint:['กดปุ่มสีเขียว แอป LINE จะเปิดขึ้นมา แล้วเลือกชื่อคนที่จะส่ง กดส่งได้เลย','အစိမ်းရောင်ခလုတ်ကို နှိပ်ပါ။ LINE ပွင့်လာရင် ပို့မယ့်သူကို ရွေးပြီး ပို့ပါ'],
+ copy:['คัดลอกข้อความ','စာကို ကော်ပီကူး'], openLine:['เปิด LINE เพื่อส่ง','LINE ဖွင့်မယ်'], back:['กลับ','နောက်သို့'],
+ reset:['ส่งแล้ว ✓ ล้างรายการ เริ่มอาทิตย์ใหม่','ပို့ပြီးပြီ ✓ စာရင်း ရှင်းမယ်'], resetArm:['แตะอีกครั้งเพื่อล้างรายการ','ရှင်းရန် ထပ်နှိပ်ပါ'],
+ cleared:['ล้างรายการแล้ว','ရှင်းပြီးပါပြီ'], copied:['คัดลอกแล้ว ไปวางใน LINE ได้เลย','ကော်ပီကူးပြီး။ LINE မှာ ကပ်ပါ'],
+ copyFail:['คัดลอกไม่ได้ กดค้างที่ข้อความแทนนะ','ကော်ပီမရပါ။ စာကို ဖိထားပါ'], useKb:['ใช้ไมค์บนแป้นพิมพ์แทนนะ','ကီးဘုတ်ပေါ်က 🎤 ကို သုံးပါ']
+};
+let lang=(function(){try{return localStorage.getItem(K_LANG)==='my'?'my':'th'}catch(e){return 'th'}})();
+const L=lang=>lang==='my'?1:0;
+function tr(k,n){const v=(TX[k]||[k,k])[L(lang)];return n==null?v:v.replace('{n}',n)}
 function load(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}}
 function store(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 
@@ -270,7 +324,21 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const fq=q=>q==null?'':(Number.isInteger(q)?String(q):String(+q.toFixed(2)));
 const uid=()=>Math.random().toString(36).slice(2,9);
 
-$('today').textContent = new Date().toLocaleDateString('th-TH',{weekday:'long',day:'numeric',month:'short',year:'numeric'});
+function showDate(){const t=new Date();let d;
+  if(lang==='my'){try{d=t.toLocaleDateString('my-MM',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}catch(e){}
+    if(!d||/[A-Za-z]/.test(d)) d=t.getDate()+' / '+(t.getMonth()+1)+' / '+t.getFullYear();}
+  else d=t.toLocaleDateString('th-TH',{weekday:'long',day:'numeric',month:'short',year:'numeric'});
+  $('today').textContent=d}
+const nameHTML=n=>lang==='my'&&MY_ITEM[n]?`${esc(MY_ITEM[n])}<span class="thai">${esc(n)}</span>`:esc(n);
+const catHTML=c=>lang==='my'&&MY_CAT[c]?`${esc(MY_CAT[c])}<span class="thai">${esc(c)}</span>`:esc(c);
+const unitTxt=u=>lang==='my'&&MY_UNIT[u]?MY_UNIT[u]:(u||'');
+function applyLang(){
+  document.body.classList.toggle('my',lang==='my'); document.documentElement.lang=lang==='my'?'my':'th';
+  document.querySelectorAll('[data-t]').forEach(el=>{const k=el.dataset.t;if(k==='kbHint')el.innerHTML=tr(k);else el.textContent=tr(k)});
+  document.querySelectorAll('.langsw button').forEach(b=>b.classList.toggle('on',b.dataset.lang===lang));
+  if(!listening) $('srBtn').textContent=tr('srIdle');
+  showDate();
+}
 
 /* ---------- Render ---------- */
 function render(){
@@ -281,34 +349,34 @@ function render(){
     const list=items.filter(i=>i.cat===c);
     if(!list.length) continue;
     const ci='c'+CATS.indexOf(c);
-    h+=`<h2><span>${EMO[c]||''}</span>${esc(c)}</h2>`;
+    h+=`<h2><span>${EMO[c]||''}</span>${catHTML(c)}</h2>`;
     for(const it of list){
       const s=state.sel[it.id];
       if(s){
-        h+=`<div class="row on ${ci}"><button class="name" data-act="toggle" data-id="${it.id}">${esc(it.name)}${s.note?`<span class="note">(${esc(s.note)})</span>`:''}</button>
+        h+=`<div class="row on ${ci}"><button class="name" data-act="toggle" data-id="${it.id}">${nameHTML(it.name)}${s.note?`<span class="note">(${esc(s.note)})</span>`:''}</button>
           <div class="step"><button data-act="minus" data-id="${it.id}" aria-label="ลด">−</button>
-          <div class="q">${fq(s.qty)}<small>${esc(s.unit||'')}</small></div>
+          <div class="q">${fq(s.qty)}<small>${esc(unitTxt(s.unit))}</small></div>
           <button data-act="plus" data-id="${it.id}" aria-label="เพิ่ม">+</button></div></div>`;
       }else{
-        h+=`<div class="row ${ci}"><button class="name" data-act="toggle" data-id="${it.id}">${esc(it.name)}</button>
-          <button class="buy" data-act="toggle" data-id="${it.id}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2.2l2.3 10.2a1.5 1.5 0 0 0 1.5 1.1h8.3a1.5 1.5 0 0 0 1.5-1.1L21 8H6.3"/><circle cx="9.5" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/></svg>ซื้อ</button></div>`;
+        h+=`<div class="row ${ci}"><button class="name" data-act="toggle" data-id="${it.id}">${nameHTML(it.name)}</button>
+          <button class="buy" data-act="toggle" data-id="${it.id}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2.2l2.3 10.2a1.5 1.5 0 0 0 1.5 1.1h8.3a1.5 1.5 0 0 0 1.5-1.1L21 8H6.3"/><circle cx="9.5" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/></svg>${tr('buy')}</button></div>`;
       }
     }
   }
-  h+=`<h2><span>✨</span>ของที่ขอซื้อเพิ่ม</h2>`;
-  if(!state.extras.length) h+=`<div class="empty-extra">ยังไม่มี กดปุ่ม 🎤 ด้านล่างเพื่อพูดสั่งเพิ่ม</div>`;
+  h+=`<h2><span>✨</span>${tr('extras')}</h2>`;
+  if(!state.extras.length) h+=`<div class="empty-extra">${tr('noExtras')}</div>`;
   for(const e of state.extras){
     h+=`<div class="row on cx"><div class="name">${esc(e.name)}</div>
       <div class="step"><button data-act="eminus" data-id="${e.id}" aria-label="ลด">−</button>
-      <div class="q">${e.qty==null?'–':fq(e.qty)}<small>${esc(e.unit||'')}</small></div>
+      <div class="q">${e.qty==null?'–':fq(e.qty)}<small>${esc(unitTxt(e.unit))}</small></div>
       <button data-act="eplus" data-id="${e.id}" aria-label="เพิ่ม">+</button></div>
       <button class="x" data-act="edel" data-id="${e.id}" aria-label="ลบ">✕</button></div>`;
   }
   $('list').innerHTML=h;
   const n=Object.keys(state.sel).length+state.extras.length;
-  $('count').innerHTML = n ? `เลือกแล้ว <b>${n}</b> รายการ` : 'แตะ “ซื้อ” ที่ของที่ต้องการ';
+  $('count').innerHTML = n ? tr('selected',n) : tr('tapBuy');
   $('sendBtn').disabled=!n;
-  $('sendBtn').innerHTML = '<span class="bub">💬</span>' + (n ? `ส่ง LINE (${n})` : 'ส่ง LINE');
+  $('sendBtn').innerHTML = '<span class="bub">💬</span>' + (n ? `${tr('send')} (${n})` : tr('send'));
 }
 
 $('list').addEventListener('click',e=>{
@@ -397,12 +465,12 @@ let parsed=[];
 function updatePreview(){
   parsed=parseSpeech($('vtext').value).map(p=>({...p,match:matchItem(p.name)}));
   $('preview').innerHTML = parsed.map((p,i)=>{
-    const q=p.qty!=null?` ${fq(p.qty)} ${esc(p.unit|| (p.match?p.match.unit:''))}`:'';
-    const tag=p.match?`<span class="tag in">✓ ติ๊กในลิสต์: ${esc(p.match.name)}</span>`:`<span class="tag ex">+ ของเพิ่ม</span>`;
+    const q=p.qty!=null?` ${fq(p.qty)} ${esc(unitTxt(p.unit|| (p.match?p.match.unit:'')))}`:'';
+    const tag=p.match?`<span class="tag in">${tr('inList')}${lang==='my'&&MY_ITEM[p.match.name]?esc(MY_ITEM[p.match.name])+' · ':''}${esc(p.match.name)}</span>`:`<span class="tag ex">${tr('extraTag')}</span>`;
     return `<div class="item"><div class="n">${esc(p.name)}${q}${tag}</div><button class="x" data-i="${i}" aria-label="ลบ">✕</button></div>`;
   }).join('');
   $('addBtn').disabled=!parsed.length;
-  $('addBtn').textContent=parsed.length?`เพิ่ม ${parsed.length} รายการ`:'เพิ่มลงรายการ';
+  $('addBtn').textContent=parsed.length?tr('addN',parsed.length):tr('addEmpty');
 }
 $('preview').addEventListener('click',e=>{
   const b=e.target.closest('[data-i]'); if(!b) return;
@@ -437,7 +505,7 @@ $('addBtn').addEventListener('click',()=>{
     }
     n++;
   }
-  save(); render(); hide(); toast(`เพิ่มแล้ว ${n} รายการ`);
+  save(); render(); hide(); toast(tr('added',n));
 });
 
 /* Optional direct speech recognition (works only where the browser allows the mic) */
@@ -449,15 +517,15 @@ $('srBtn').addEventListener('click',()=>{
   if(listening){stopSR();return}
   try{
     rec=new SR(); rec.lang='th-TH'; rec.interimResults=false; rec.continuous=false;
-    rec.onstart=()=>{listening=true;$('srBtn').classList.add('listening');$('srBtn').textContent='กำลังฟัง… แตะเพื่อหยุด'};
-    rec.onend=()=>{listening=false;$('srBtn').classList.remove('listening');$('srBtn').textContent='🎤 แตะแล้วพูดต่อได้'};
+    rec.onstart=()=>{listening=true;$('srBtn').classList.add('listening');$('srBtn').textContent=tr('srOn')};
+    rec.onend=()=>{listening=false;$('srBtn').classList.remove('listening');$('srBtn').textContent=tr('srAgain')};
     rec.onresult=e=>{
       const txt=[...e.results].map(r=>r[0].transcript).join(' ');
       const ta=$('vtext'); ta.value = ta.value.trim() ? ta.value.trim()+'\n'+txt : txt; updatePreview();
     };
     rec.onerror=e=>{
       if(e.error==='not-allowed'||e.error==='service-not-allowed'||e.error==='audio-capture'){
-        $('srBtn').hidden=true; $('kbAlt').hidden=true; toast('ใช้ไมค์บนแป้นพิมพ์แทนนะ'); try{$('vtext').focus()}catch(_){}
+        $('srBtn').hidden=true; $('kbAlt').hidden=true; toast(tr('useKb')); try{$('vtext').focus()}catch(_){}
       }
     };
     rec.start();
@@ -491,21 +559,23 @@ $('sendBtn').addEventListener('click',()=>{
 });
 $('copyBtn').addEventListener('click',()=>{
   const m=$('msgPreview').textContent;
-  const done=()=>toast('คัดลอกแล้ว ไปวางใน LINE ได้เลย');
+  const done=()=>toast(tr('copied'));
   try{ navigator.clipboard.writeText(m).then(done,fallback); }catch(e){ fallback(); }
   function fallback(){
     const ta=document.createElement('textarea'); ta.value=m; document.body.appendChild(ta); ta.select();
-    try{document.execCommand('copy');done()}catch(e){toast('คัดลอกไม่ได้ กดค้างที่ข้อความแทนนะ')} ta.remove();
+    try{document.execCommand('copy');done()}catch(e){toast(tr('copyFail'))} ta.remove();
   }
 });
 let armT=null;
-function disarm(){clearTimeout(armT);$('resetBtn').classList.remove('arm');$('resetBtn').textContent='ส่งแล้ว ✓ ล้างรายการ เริ่มอาทิตย์ใหม่'}
+function disarm(){clearTimeout(armT);$('resetBtn').classList.remove('arm');$('resetBtn').textContent=tr('reset')}
 $('resetBtn').addEventListener('click',()=>{
   const b=$('resetBtn');
-  if(!b.classList.contains('arm')){b.classList.add('arm');b.textContent='แตะอีกครั้งเพื่อล้างรายการ';armT=setTimeout(disarm,4000);return}
-  state={sel:{},extras:[]}; save(); render(); hide(); toast('ล้างรายการแล้ว');
+  if(!b.classList.contains('arm')){b.classList.add('arm');b.textContent=tr('resetArm');armT=setTimeout(disarm,4000);return}
+  state={sel:{},extras:[]}; save(); render(); hide(); toast(tr('cleared'));
 });
 
+document.querySelectorAll('.langsw button').forEach(b=>b.addEventListener('click',()=>{lang=b.dataset.lang;try{localStorage.setItem(K_LANG,lang)}catch(e){};applyLang();render()}));
+applyLang();
 render();
 
 /* ---------- Shopping mode ---------- */
@@ -514,14 +584,37 @@ let shop=load(K_SHOP);
 const CATK={};CATS.forEach((c,i)=>CATK[c]='c'+i);CATK['ของที่ขอซื้อเพิ่ม']='cx';
 function saveShop(){store(K_SHOP,shop)}
 
+const EXTRA_CAT='ของที่ขอซื้อเพิ่ม';
 function parseLineMsg(text){
   const out=[]; let cat='';
   for(let ln of text.split(/\r?\n/)){
     ln=ln.trim(); if(!ln) continue;
     const h=ln.match(/^【(.+)】$/); if(h){cat=h[1];continue}
-    const b=ln.match(/^[•・\-*]\s*(.+)$/); if(b) out.push({id:uid(),cat,text:b[1].trim(),st:'todo'});
+    if(/^(🛒|📅|รวม\s*\d|✅|❌|⏳)/.test(ln)) continue;
+    const b=ln.match(/^[•・\-*–]\s*(.+)$/);
+    if(b){ out.push({id:uid(),cat:cat||EXTRA_CAT,text:b[1].trim(),st:'todo'}); continue; }
+    // plain text (e.g. translated message): one item per line or comma
+    for(let part of ln.split(/[,，、;]/)){
+      part=part.replace(/^\s*(?:\d+\s*[.)]|[(\[]?\d+[)\]])\s*/,'').replace(/[.。:：]+$/,'').trim();
+      if(part) out.push({id:uid(),cat:EXTRA_CAT,text:part,st:'todo'});
+    }
   }
   return out;
+}
+const nkey=t=>splitText(t)[0].replace(/\s|ๆ/g,'').toLowerCase();
+function mergeInto(list,news){
+  let added=0;
+  for(const it of news){
+    const ex=list.find(x=>x.st==='todo'&&x.cat===it.cat&&nkey(x.text)===nkey(it.text));
+    if(ex){
+      const [n1,r1]=splitText(ex.text), [,r2]=splitText(it.text);
+      if(r2) ex.text = n1+' '+(r1?r1+' + ':'')+r2;
+    }else{ list.push(it); added++; }
+  }
+  // keep items grouped by category in the order they first appear
+  const order=[]; list.forEach(x=>{if(!order.includes(x.cat))order.push(x.cat)});
+  list.sort((a,b)=>order.indexOf(a.cat)-order.indexOf(b.cat));
+  return added;
 }
 function splitText(t){ // name + rest (qty/unit/note)
   const m=t.match(/^(.+?)\s+(\d[\d.]*\s*.*)$/); return m?[m[1],m[2]]:[t,''];
@@ -530,6 +623,7 @@ function rowHTML(it){
   const [nm,rest]=splitText(it.text); const k=CATK[it.cat]||'';
   const label=`<div class="st">${esc(nm)}${rest?`<small>${esc(rest)}</small>`:''}</div>`;
   if(it.st==='todo') return `<div class="srow ${k}">${label}
+     ${it.cat===EXTRA_CAT?`<button class="sdel" data-del="${it.id}" aria-label="ลบ">✕</button>`:''}
      <button class="nab" data-s="na" data-id="${it.id}">ไม่มี<br>ขาย</button>
      <button class="gotb" data-s="done" data-id="${it.id}">✓ ซื้อแล้ว</button></div>`;
   return `<div class="srow ${it.st}">${label}<button class="undo" data-s="todo" data-id="${it.id}">↩ ยกเลิก</button></div>`;
@@ -559,12 +653,25 @@ function shopSummary(){
   return L.join('\n');
 }
 $('makeShop').addEventListener('click',()=>{
-  const items=parseLineMsg($('pasteBox').value);
-  if(!items.length){$('pasteErr').hidden=false;return}
-  $('pasteErr').hidden=true; shop={items,created:Date.now()}; saveShop(); $('pasteBox').value=''; renderShop(); window.scrollTo(0,0);
-  toast(`ได้ ${items.length} รายการ`);
+  const news=parseLineMsg($('pasteBox').value);
+  if(!news.length){$('pasteErr').hidden=false;return}
+  $('pasteErr').hidden=true; const list=[]; mergeInto(list,news);
+  shop={items:list,created:Date.now()}; saveShop(); $('pasteBox').value=''; renderShop(); window.scrollTo(0,0);
+  toast(`ได้ ${list.length} รายการ`);
+});
+$('addMoreBtn').addEventListener('click',()=>{$('addCard').hidden=false;$('addMoreBtn').hidden=true;$('moreErr').hidden=true;try{$('pasteMore').focus()}catch(e){}});
+$('moreCancel').addEventListener('click',()=>{$('addCard').hidden=true;$('addMoreBtn').hidden=false;$('pasteMore').value=''});
+$('moreAdd').addEventListener('click',()=>{
+  const news=parseLineMsg($('pasteMore').value);
+  if(!news.length){$('moreErr').hidden=false;return}
+  const before=shop.items.length; mergeInto(shop.items,news); saveShop();
+  $('pasteMore').value=''; $('addCard').hidden=true; $('addMoreBtn').hidden=false; renderShop();
+  const merged=news.length-(shop.items.length-before);
+  toast(`เพิ่ม ${shop.items.length-before} รายการ`+(merged?` · รวมของซ้ำ ${merged}`:''));
 });
 $('shopItems').addEventListener('click',e=>{
+  const d=e.target.closest('[data-del]');
+  if(d){ shop.items=shop.items.filter(i=>i.id!==d.dataset.del); saveShop(); renderShop(); return; }
   const b=e.target.closest('[data-s]'); if(!b) return;
   const it=shop.items.find(i=>i.id===b.dataset.id); if(!it) return;
   it.st=b.dataset.s; saveShop(); renderShop();
