@@ -269,9 +269,23 @@ h2 .thai{display:inline;margin-left:6px}
 </div>
 
 <div class="toast" id="toast"></div>
+<div id="ver" style="text-align:center;color:#b9aa9a;font-size:13px;padding:0 0 110px">เวอร์ชัน 2026-11-09.1</div>
 
 <script>
 (function(){
+/* auto-update: compare with version.json on the server and reload if newer */
+const APP_V='2026-11-09.1';
+function checkUpdate(){
+  fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(j=>{
+    if(!j||!j.v||j.v===APP_V) return;
+    let tried=''; try{tried=sessionStorage.getItem('kitchen.upd')||''}catch(e){}
+    if(tried===j.v) return;
+    try{sessionStorage.setItem('kitchen.upd',j.v)}catch(e){}
+    location.replace(location.pathname+'?v='+encodeURIComponent(j.v));
+  }).catch(()=>{});
+}
+checkUpdate();
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 const CATS = ['ข้าวและไข่','เครื่องปรุง','ผักและสมุนไพร','เนื้อสัตว์','ของใช้'];
 const DEFAULT_ITEMS = [
   ['ไข่ไก่','แผง',0],['ข้าวคน','ถุง',0],['ข้าวหมา','ถุง',0],
