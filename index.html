@@ -269,12 +269,12 @@ h2 .thai{display:inline;margin-left:6px}
 </div>
 
 <div class="toast" id="toast"></div>
-<div id="ver" style="text-align:center;color:#b9aa9a;font-size:13px;padding:0 0 110px">เวอร์ชัน 2026-11-09.1</div>
+<div id="ver" style="text-align:center;color:#b9aa9a;font-size:13px;padding:0 0 110px">เวอร์ชัน 2026-11-09.2</div>
 
 <script>
 (function(){
 /* auto-update: compare with version.json on the server and reload if newer */
-const APP_V='2026-11-09.1';
+const APP_V='2026-11-09.2';
 function checkUpdate(){
   fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(j=>{
     if(!j||!j.v||j.v===APP_V) return;
@@ -473,6 +473,7 @@ const norm=s=>s.replace(/\s|ๆ/g,'');
 function matchItem(name){
   const n=norm(name);
   let m=items.find(i=>norm(i.name)===n); if(m) return m;
+  m=items.find(i=>MY_ITEM[i.name]&&norm(MY_ITEM[i.name])===n); if(m) return m;
   const inc=items.filter(i=>norm(i.name).length>=2 && n.startsWith(norm(i.name))).sort((a,b)=>b.name.length-a.name.length);
   if(inc.length) return inc[0];
   const pre=items.filter(i=>n.length>=2 && norm(i.name).startsWith(n));
@@ -567,6 +568,8 @@ function buildMsg(){
     lines.push('','【ของที่ขอซื้อเพิ่ม】');
     for(const e of state.extras){lines.push((`• ${e.name} `+(e.qty!=null?`${fq(e.qty)} ${e.unit||''}`:'')).trim()); total++;}
   }
+  const my=state.extras.filter(e=>/[\u1000-\u109F]/.test(e.name)).map(e=>e.name);
+  if(my.length) lines.push('','🌐 แปลเป็นไทย: https://translate.google.com/?sl=my&tl=th&op=translate&text='+encodeURIComponent(my.join('\n')));
   lines.push('',`รวม ${total} รายการ`);
   return lines.join('\n');
 }
