@@ -269,12 +269,12 @@ h2 .thai{display:inline;margin-left:6px}
 </div>
 
 <div class="toast" id="toast"></div>
-<div id="ver" style="text-align:center;color:#b9aa9a;font-size:13px;padding:0 0 110px">เวอร์ชัน 2026-11-09.2</div>
+<div id="ver" style="text-align:center;color:#b9aa9a;font-size:13px;padding:0 0 110px">เวอร์ชัน 2026-11-09.3</div>
 
 <script>
 (function(){
 /* auto-update: compare with version.json on the server and reload if newer */
-const APP_V='2026-11-09.2';
+const APP_V='2026-11-09.3';
 function checkUpdate(){
   fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(j=>{
     if(!j||!j.v||j.v===APP_V) return;
@@ -440,7 +440,27 @@ function clean(s){
   return s.replace(/^(?:ซื้อ|เอา|ขอ|อีก|แล้วก็|ก็|แล้ว)+/,'')
           .replace(/(?:ค่ะ|คะ|ครับ|จ้ะ|จ้า|นะ|หน่อย|ด้วย)+$/,'').trim();
 }
+function parseMyLine(line){
+  const out=[];
+  for(let part of line.split(/[,，、၊။;]/)){
+    part=part.replace(/[၀-၉]/g,d=>'၀၁၂၃၄၅၆၇၈၉'.indexOf(d)).replace(/[๐-๙]/g,d=>'๐๑๒๓๔๕๖๗๘๙'.indexOf(d)).trim();
+    if(!part) continue;
+    const m=part.match(/^(.*?)\s*(\d+(?:\.\d+)?)\s*([^\d\s]*)$/);
+    let name=part, qty=null, unit='';
+    if(m&&m[1].trim()){ name=m[1].trim(); qty=parseFloat(m[2]); unit=m[3]||''; }
+    else { const m2=part.match(/^(\d+(?:\.\d+)?)\s+(.+)$/); if(m2){qty=parseFloat(m2[1]);name=m2[2].trim();} }
+    out.push({name,qty,unit});
+  }
+  return out;
+}
 function parseSpeech(text){
+  // Burmese lines: one item per line (Burmese puts spaces between words)
+  const myRe=/[\u1000-\u109F]/, lines=text.split(/\r?\n/);
+  if(lines.some(l=>myRe.test(l))){
+    let res=[];
+    for(const l of lines){ if(myRe.test(l)) res=res.concat(parseMyLine(l)); else if(l.trim()) res=res.concat(parseSpeech(l)); }
+    return res;
+  }
   let t=' '+text+' ';
   t=t.replace(/[๐-๙]/g,d=>'๐๑๒๓๔๕๖๗๘๙'.indexOf(d));
   t=t.replace(new RegExp(`(${NUMW})\\s*(?=(?:${UNIT_RE}))`,'g'),m=>' '+wordNum(m.trim())+' ');
@@ -516,7 +536,7 @@ $('addBtn').addEventListener('click',()=>{
   for(const p of parsed){
     if(p.match){
       const s=state.sel[p.match.id];
-      const note = norm(p.name)!==norm(p.match.name) && !norm(p.match.name).startsWith(norm(p.name)) ? p.name : '';
+      const note = norm(p.name)!==norm(p.match.name) && !norm(p.match.name).startsWith(norm(p.name)) && norm(MY_ITEM[p.match.name]||'')!==norm(p.name) ? p.name : '';
       state.sel[p.match.id]={qty:p.qty!=null?p.qty:(s?s.qty:1), unit:p.unit||(s?s.unit:p.match.unit), note: note||(s&&s.note)||''};
     }else{
       const ex=state.extras.find(x=>norm(x.name)===norm(p.name));
